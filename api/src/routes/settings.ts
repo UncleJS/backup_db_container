@@ -31,29 +31,47 @@ export const settingsRoutes = new Elysia({ prefix: "/settings" })
   }, { detail: { summary: "Get all settings", tags: ["Settings"] } })
 
   // -------------------------------------------------------------------------
-  // PUT /settings — bulk upsert of key-value pairs
+  // PUT /settings — bulk upsert of key-value pairs (archive-on-change)
+  //
+  // For each key:
+  //   • If no active row exists → INSERT new row
+  //   • If an active row exists AND the value is different → archive the old
+  //     row (set archivedAt) then INSERT a new row.  This preserves the full
+  //     audit trail of every value a setting has ever had.
+  //   • If the value is identical → no-op (avoid spurious archive rows)
   // -------------------------------------------------------------------------
   .put(
     "/",
     async ({ body }) => {
       const now = new Date().toISOString().replace("T", " ").substring(0, 19);
 
+      let updated = 0;
       for (const [key, value] of Object.entries(body)) {
+        const strValue = String(value);
+
         const [existing] = await db
           .select()
           .from(settings)
           .where(and(eq(settings.key, key), isNull(settings.archivedAt)));
 
         if (existing) {
-          await db.update(settings)
-            .set({ value: String(value), updatedAt: now })
+          if (existing.value === strValue) {
+            // Value unchanged — skip entirely to avoid polluting the audit log
+            continue;
+          }
+          // Archive the current active row before inserting the new value
+          await db
+            .update(settings)
+            .set({ archivedAt: now })
             .where(eq(settings.id, existing.id));
-        } else {
-          await db.insert(settings).values({ key, value: String(value), updatedAt: now });
         }
+
+        // Insert the new active row
+        await db.insert(settings).values({ key, value: strValue, updatedAt: now });
+        updated++;
       }
 
-      return { updated: Object.keys(body).length };
+      return { updated };
     },
     {
       body: t.Record(t.String(), t.Any()),

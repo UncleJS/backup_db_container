@@ -96,11 +96,15 @@ export const healthRoutes = new Elysia({ prefix: "/health" }).get(
       checkSourceMariadb(),
     ]);
 
-    const overall = checks.every((c) => c.status === "ok")
+    // Three-way overall status:
+    //   "ok"          — all checks passed
+    //   "unreachable" — at least one dependency cannot be reached at all
+    //   "degraded"    — at least one check returned degraded (e.g. high latency, partial failure)
+    const overall: "ok" | "degraded" | "unreachable" = checks.every((c) => c.status === "ok")
       ? "ok"
       : checks.some((c) => c.status === "unreachable")
-      ? "degraded"
-      : "ok";
+      ? "unreachable"
+      : "degraded";
 
     if (overall !== "ok") set.status = 503;
 

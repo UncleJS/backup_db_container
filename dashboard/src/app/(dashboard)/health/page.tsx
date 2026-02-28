@@ -80,7 +80,7 @@ export default async function HealthPage() {
 
   try {
     // Health endpoint is public (no auth required)
-    const apiBase = process.env.API_INTERNAL_URL ?? process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:3001";
+    const apiBase = process.env.API_INTERNAL_URL ?? "http://localhost:3001";
     const res = await fetch(`${apiBase}/health`, { cache: "no-store" });
     health = await res.json();
   } catch (err) {

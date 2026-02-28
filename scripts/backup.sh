@@ -66,10 +66,12 @@ RUN_DIR="${BACKUP_OUTPUT_DIR}/${RUN_TS}"
 
 # ---------------------------------------------------------------------------
 # Check for manual trigger signal
+# The trigger file is written by the API to the shared /backups volume so
+# both the api container and the agent container can see it.
 # ---------------------------------------------------------------------------
-if [[ -f /tmp/backup-trigger ]]; then
+if [[ -f "${BACKUP_OUTPUT_DIR}/.backup-trigger" ]]; then
   TRIGGER_TYPE="manual"
-  rm -f /tmp/backup-trigger
+  rm -f "${BACKUP_OUTPUT_DIR}/.backup-trigger"
   log "Manual trigger detected."
 fi
 
@@ -85,7 +87,11 @@ log "Tracking run ID: ${RUN_ID}"
 
 OVERALL_STATUS="success"
 TOTAL_SIZE=0
-ERRORS=()
+# Separate tracking: backup-step failures vs upload-step failures.
+# backup step failure  → final status "failed"
+# upload-only failure  → final status "partial"
+BACKUP_ERRORS=()
+UPLOAD_ERRORS=()
 
 # ---------------------------------------------------------------------------
 # Step 1 — MariaDB backup
@@ -100,8 +106,7 @@ if [[ "${BACKUP_MARIADB}" == "true" ]]; then
     log "MariaDB backup completed."
   else
     err "MariaDB backup FAILED."
-    ERRORS+=("mariadb")
-    OVERALL_STATUS="partial"
+    BACKUP_ERRORS+=("mariadb")
   fi
 fi
 
@@ -116,8 +121,7 @@ if [[ "${BACKUP_VOLUMES}" == "true" ]]; then
     log "Volume backup completed."
   else
     err "Volume backup FAILED."
-    ERRORS+=("volumes")
-    OVERALL_STATUS="partial"
+    BACKUP_ERRORS+=("volumes")
   fi
 fi
 
@@ -131,8 +135,7 @@ if [[ "${BACKUP_CONFIGS}" == "true" ]]; then
     log "Config backup completed."
   else
     err "Config backup FAILED."
-    ERRORS+=("configs")
-    OVERALL_STATUS="partial"
+    BACKUP_ERRORS+=("configs")
   fi
 fi
 
@@ -147,8 +150,7 @@ if [[ "${S3_ENABLED}" == "true" ]]; then
     log "S3 upload completed."
   else
     err "S3 upload FAILED."
-    ERRORS+=("s3_upload")
-    [[ "${OVERALL_STATUS}" == "success" ]] && OVERALL_STATUS="partial"
+    UPLOAD_ERRORS+=("s3_upload")
   fi
 fi
 
@@ -163,8 +165,7 @@ if [[ "${SFTP_ENABLED}" == "true" ]]; then
     log "SFTP upload completed."
   else
     err "SFTP upload FAILED."
-    ERRORS+=("sftp_upload")
-    [[ "${OVERALL_STATUS}" == "success" ]] && OVERALL_STATUS="partial"
+    UPLOAD_ERRORS+=("sftp_upload")
   fi
 fi
 
@@ -184,9 +185,15 @@ if [[ -d "${RUN_DIR}" ]]; then
 fi
 
 ERROR_MSG=""
-if [[ ${#ERRORS[@]} -gt 0 ]]; then
-  ERROR_MSG="Failed steps: $(IFS=,; echo "${ERRORS[*]}")"
+if [[ ${#BACKUP_ERRORS[@]} -gt 0 ]]; then
+  # One or more backup steps failed → the run is a failure
+  ALL_ERRORS=("${BACKUP_ERRORS[@]}" "${UPLOAD_ERRORS[@]}")
+  ERROR_MSG="Failed steps: $(IFS=,; echo "${ALL_ERRORS[*]}")"
   OVERALL_STATUS="failed"
+elif [[ ${#UPLOAD_ERRORS[@]} -gt 0 ]]; then
+  # Backup succeeded but one or more uploads failed → partial
+  ERROR_MSG="Failed uploads: $(IFS=,; echo "${UPLOAD_ERRORS[*]}")"
+  OVERALL_STATUS="partial"
 fi
 
 db_complete_run "${RUN_ID}" "${OVERALL_STATUS}" "${TOTAL_SIZE}" "${ERROR_MSG}"

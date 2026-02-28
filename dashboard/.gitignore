@@ -1,0 +1,19 @@
+# Dependencies
+node_modules/
+bun.lock
+
+# Next.js
+.next/
+out/
+
+# Build output
+dist/
+build/
+
+# Environment files
+.env
+.env.local
+.env.*.local
+
+# Logs
+*.log

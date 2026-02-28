@@ -25,8 +25,12 @@ if [[ ! -S "${PODMAN_SOCKET}" ]]; then
   exit 1
 fi
 
+# Use the version-agnostic /libpod path.  The versioned prefix (e.g. /v4.0.0)
+# is optional for the local socket — Podman accepts requests without it and
+# will route to the current API version.  Hardcoding a version string causes
+# failures when the installed Podman is newer or older than the pinned value.
 podman_api() {
-  curl -sf --unix-socket "${PODMAN_SOCKET}" "http://d/v4.0.0/libpod$1"
+  curl -sf --unix-socket "${PODMAN_SOCKET}" "http://d/libpod$1"
 }
 
 # -----------------------------------------------------------------------

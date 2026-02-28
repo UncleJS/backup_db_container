@@ -1,0 +1,38 @@
+# Dependencies
+node_modules/
+bun.lock
+
+# Next.js
+.next/
+out/
+
+# Build output
+dist/
+build/
+
+# Environment files (contain secrets)
+.env
+.env.local
+.env.*.local
+
+# Drizzle generated (keep migrations, ignore generated client)
+# api/src/db/migrations/ is intentionally tracked
+
+# OS / editor
+.DS_Store
+Thumbs.db
+*.swp
+*.swo
+.idea/
+.vscode/
+
+# Logs
+*.log
+npm-debug.log*
+bun-debug.log*
+
+# Runtime / temp
+*.pid
+*.seed
+*.pid.lock
+.cache/

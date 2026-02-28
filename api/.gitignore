@@ -1,0 +1,17 @@
+# Dependencies
+node_modules/
+bun.lock
+
+# Build output
+dist/
+
+# Environment files
+.env
+.env.local
+.env.*.local
+
+# Drizzle kit output (migrations are tracked, meta is tracked)
+# drizzle/ is intentionally tracked
+
+# Logs
+*.log

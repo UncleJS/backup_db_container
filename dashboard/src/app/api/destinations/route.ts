@@ -1,10 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getSession } from "@/lib/session";
 
-const API_BASE =
-  process.env.API_INTERNAL_URL ??
-  process.env.NEXT_PUBLIC_API_URL ??
-  "http://localhost:3001";
+const API_BASE = process.env.API_INTERNAL_URL ?? "http://localhost:3001";
 
 function apiHeaders() {
   return {

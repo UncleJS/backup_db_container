@@ -4,6 +4,10 @@
 #
 # This service is started by backup-agent.timer OR manually via:
 #   systemctl --user start backup-agent.service
+#
+# NOTE: Quadlet generates a systemd service named "backup-agent.service" from
+# backup-agent.container.  This wrapper simply delegates to that generated unit.
+# The generated name is always "<stem>.service" — never "<stem>-container.service".
 # =============================================================================
 [Unit]
 Description=Backup Agent Run
@@ -12,8 +16,8 @@ Requires=backup-pod.service backup-api.service backup-tracking-db.service
 
 [Service]
 Type=oneshot
-# Delegate to the container unit
-ExecStart=systemctl --user start backup-agent-container.service
+# Delegate to the Quadlet-generated container unit (stem = "backup-agent")
+ExecStart=systemctl --user start backup-agent.service
 RemainAfterExit=no
 
 [Install]

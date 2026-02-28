@@ -1,9 +1,8 @@
 import "server-only";
 
-const API_BASE =
-  process.env.API_INTERNAL_URL ??
-  process.env.NEXT_PUBLIC_API_URL ??
-  "http://localhost:3001";
+// API_INTERNAL_URL is a server-only env var (no NEXT_PUBLIC_ prefix).
+// It is never bundled into client JS.
+const API_BASE = process.env.API_INTERNAL_URL ?? "http://localhost:3001";
 
 function getSecret(): string {
   // Read from env (populated from Podman secret in entrypoint)

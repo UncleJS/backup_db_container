@@ -1,6 +1,11 @@
+"use client";
+
+import { useActionState } from "react";
 import { loginAction } from "@/app/actions";
 
 export default function LoginPage() {
+  const [state, formAction, isPending] = useActionState(loginAction, null);
+
   return (
     <div className="min-h-screen flex items-center justify-center bg-background px-4">
       <div className="w-full max-w-sm">
@@ -18,7 +23,14 @@ export default function LoginPage() {
 
         {/* Login card */}
         <div className="bg-card border border-border rounded-lg p-6 shadow-xl">
-          <form action={loginAction} className="space-y-4">
+          {/* Error banner */}
+          {state?.error && (
+            <div className="mb-4 px-3 py-2.5 rounded-md bg-destructive/15 border border-destructive/30 text-destructive text-sm">
+              {state.error}
+            </div>
+          )}
+
+          <form action={formAction} className="space-y-4">
             <div>
               <label htmlFor="username" className="block text-sm font-medium text-foreground mb-1.5">
                 Username
@@ -55,10 +67,12 @@ export default function LoginPage() {
 
             <button
               type="submit"
+              disabled={isPending}
               className="w-full py-2.5 px-4 rounded-md bg-primary text-primary-foreground text-sm font-semibold
-                         hover:bg-primary/90 focus:outline-none focus:ring-2 focus:ring-ring transition-colors"
+                         hover:bg-primary/90 focus:outline-none focus:ring-2 focus:ring-ring transition-colors
+                         disabled:opacity-60 disabled:cursor-not-allowed"
             >
-              Sign in
+              {isPending ? "Signing in…" : "Sign in"}
             </button>
           </form>
         </div>

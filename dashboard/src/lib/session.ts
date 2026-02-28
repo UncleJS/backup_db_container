@@ -1,16 +1,9 @@
 import "server-only";
 import { SignJWT, jwtVerify } from "jose";
 import { cookies } from "next/headers";
+import { getSecretKey } from "./auth";
 
 const SESSION_COOKIE = "backup_session";
-
-function getSecretKey(): Uint8Array {
-  const secret =
-    process.env.SESSION_SECRET ??
-    process.env.DASHBOARD_SESSION_SECRET ??
-    "change-me-in-production-32-chars!!";
-  return new TextEncoder().encode(secret);
-}
 
 export async function createSession(userId: string, username: string) {
   const expiresAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000); // 7 days

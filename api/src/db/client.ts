@@ -8,7 +8,9 @@ const password = process.env.TRACKING_DB_PASSWORD ?? "";
 const pool = mysql.createPool({
   host: process.env.TRACKING_DB_HOST ?? "localhost",
   port: parseInt(process.env.TRACKING_DB_PORT ?? "3307", 10),
-  user: process.env.TRACKING_DB_USER ?? "tracking_user",
+  // Default matches MARIADB_USER in backup-tracking-db.container and
+  // TRACKING_DB_USER in backup-api.container (both set to "backup_api").
+  user: process.env.TRACKING_DB_USER ?? "backup_api",
   password,
   database: process.env.TRACKING_DB_NAME ?? "backup_tracking",
   waitForConnections: true,

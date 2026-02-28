@@ -19,6 +19,11 @@ Pod=backup-pod.pod
 Secret=tracking_db_password,target=/run/secrets/tracking_db_password
 Secret=internal_api_secret,target=/run/secrets/internal_api_secret
 
+# Shared backups volume — the API writes the manual trigger sentinel file
+# (.backup-trigger) here so the backup-agent container can detect it.
+# Both containers must mount the same host path.
+Volume=/var/lib/backup-agent/backups:/backups:z
+
 # Non-secret environment
 Environment=NODE_ENV=production
 Environment=PORT=3001

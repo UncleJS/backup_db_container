@@ -18,7 +18,10 @@ function getAdminUsername(): string {
   return process.env.DASHBOARD_ADMIN_USER ?? "admin";
 }
 
-export async function loginAction(formData: FormData) {
+export async function loginAction(
+  _prevState: { error?: string } | null,
+  formData: FormData
+): Promise<{ error: string } | null> {
   const username = formData.get("username") as string;
   const password = formData.get("password") as string;
 

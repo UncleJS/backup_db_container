@@ -2,9 +2,9 @@ import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
   output: "standalone",
-  env: {
-    NEXT_PUBLIC_API_URL: process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:3001",
-  },
+  // API_INTERNAL_URL is read server-side only (no NEXT_PUBLIC_ prefix).
+  // It is never injected into the client bundle.
+  // Set it via the backup-dashboard.container Environment= line or .env.local.
 };
 
 export default nextConfig;

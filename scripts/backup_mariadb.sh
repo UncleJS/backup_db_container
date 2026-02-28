@@ -190,51 +190,33 @@ log "Recorded physical backup file: ID=${FILE_ID}"
 DUMP_FILE="${RUN_DIR}/mariadb-dump-all.sql.gz"
 log "Starting logical dump → ${DUMP_FILE}..."
 
+# mariadb-dump flags (explained):
+#   --single-transaction  : consistent InnoDB snapshot with no row locks
+#   --quick               : stream rows one at a time (prevents OOM on large tables)
+#   --lock-tables=false   : disable MyISAM table locks (safe with --single-transaction)
+#   --routines            : include stored procedures and functions
+#   --triggers            : include trigger definitions
+#   --events              : include scheduled event definitions
+#   --comments            : add MariaDB version/dump-time header comments
+#   --gtid-current-pos    : record GTID position for replication resume
+# stderr → /dev/null suppresses the "password on command line" warning;
+# the password is in the environment, not a visible --password= arg.
 mariadb-dump \
   --host="${MARIADB_HOST}" \
   --port="${MARIADB_PORT}" \
   --user="${MARIADB_USER}" \
   --password="${MARIADB_PASSWORD}" \
   --all-databases \
-  \
-  # --single-transaction: wraps all tables in a single READ COMMITTED
-  # transaction so we get a consistent snapshot without locking any rows.
-  # This is the correct option for InnoDB tables and avoids blocking writes.
   --single-transaction \
-  \
-  # --quick: fetches rows one at a time rather than buffering the entire
-  # result set in memory.  Essential for large tables (prevents OOM).
   --quick \
-  \
-  # --lock-tables=false: must be explicitly disabled because mariadb-dump
-  # enables it by default for non-transactional tables (MyISAM).  Combined
-  # with --single-transaction, this gives a consistent InnoDB dump with no
-  # table locks at all.  If the target has MyISAM tables, add --lock-tables
-  # back and accept the brief read lock.
   --lock-tables=false \
-  \
-  # --routines: include stored procedures and functions in the dump.
-  # --triggers: include trigger definitions.
-  # --events: include scheduled event definitions.
-  # These are excluded by default but are needed for a complete restore.
   --routines \
   --triggers \
   --events \
-  \
-  # --comments: include version and dump-time comments at the top of the file.
-  # Useful for auditing which MariaDB version produced this dump.
   --comments \
-  \
-  # --gtid-current-pos: add a SET @@gtid_current_pos statement at the top of
-  # the dump.  This records the current GTID position at the time of the dump
-  # so that replication can be set up from this backup without a gap.
-  # Harmless if GTIDs are not in use.
   --gtid-current-pos \
   2>/dev/null \
   | gzip > "${DUMP_FILE}"
-# stderr is redirected to /dev/null to suppress the "Warning: Using a password
-# on the command line is insecure" message — the password is in the env, not
-# in a --password= flag visible via `ps`, but MariaDB still warns.
 
 FILE_ID="$(db_record_file "${RUN_ID}" "${DUMP_FILE}" "dump")"
 log "Recorded dump file: ID=${FILE_ID}"

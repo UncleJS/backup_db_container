@@ -38,7 +38,8 @@ Environment=BACKUP_DIR=/backups
 Environment=MARIADB_BACKUP_MODE=full
 Environment=MARIADB_HOST=127.0.0.1
 Environment=MARIADB_PORT=3306
-Environment=MARIADB_BACKUP_USER=root
+# MARIADB_USER is the env var read by backup.sh and passed to backup_mariadb.sh
+Environment=MARIADB_USER=root
 
 # API base URL (pod-local)
 Environment=API_BASE_URL=http://localhost:3001

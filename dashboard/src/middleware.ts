@@ -1,15 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import { jwtVerify } from "jose";
+import { getSecretKey } from "@/lib/auth";
 
 const SESSION_COOKIE = "backup_session";
-
-function getSecretKey(): Uint8Array {
-  const secret =
-    process.env.SESSION_SECRET ??
-    process.env.DASHBOARD_SESSION_SECRET ??
-    "change-me-in-production-32-chars!!";
-  return new TextEncoder().encode(secret);
-}
 
 const PUBLIC_PATHS = ["/login", "/api/auth"];
 
