@@ -1,0 +1,19 @@
+# =============================================================================
+# backup-pod.pod  — Quadlet pod unit
+# Place in: ~/.config/containers/systemd/
+# =============================================================================
+[Unit]
+Description=Backup DB Pod
+After=network-online.target
+Wants=network-online.target
+
+[Pod]
+PodName=backup-pod
+
+# Publish ports on the host (optional — remove if only internal access needed)
+PublishPort=3000:3000
+PublishPort=3001:3001
+PublishPort=3307:3306
+
+[Install]
+WantedBy=default.target

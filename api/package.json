@@ -1,0 +1,28 @@
+{
+  "name": "backup-api",
+  "version": "1.0.0",
+  "description": "Backup tracking API — Elysia/Bun",
+  "main": "src/index.ts",
+  "scripts": {
+    "dev": "bun run --watch src/index.ts",
+    "start": "bun run src/index.ts",
+    "db:generate": "drizzle-kit generate",
+    "db:migrate": "drizzle-kit migrate",
+    "db:push": "drizzle-kit push",
+    "db:studio": "drizzle-kit studio"
+  },
+  "dependencies": {
+    "elysia": "^1.2.0",
+    "@elysiajs/openapi": "^1.2.0",
+    "@elysiajs/cors": "^1.2.0",
+    "drizzle-orm": "^0.38.0",
+    "mysql2": "^3.11.0",
+    "bcryptjs": "^2.4.3",
+    "jose": "^5.9.0"
+  },
+  "devDependencies": {
+    "@types/bcryptjs": "^2.4.6",
+    "drizzle-kit": "^0.30.0",
+    "bun-types": "latest"
+  }
+}

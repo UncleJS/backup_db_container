@@ -1,0 +1,20 @@
+# =============================================================================
+# backup-agent.service  — Quadlet service unit (manual / timer-activated)
+# Place in: ~/.config/containers/systemd/
+#
+# This service is started by backup-agent.timer OR manually via:
+#   systemctl --user start backup-agent.service
+# =============================================================================
+[Unit]
+Description=Backup Agent Run
+After=backup-pod.service backup-api.service backup-tracking-db.service
+Requires=backup-pod.service backup-api.service backup-tracking-db.service
+
+[Service]
+Type=oneshot
+# Delegate to the container unit
+ExecStart=systemctl --user start backup-agent-container.service
+RemainAfterExit=no
+
+[Install]
+WantedBy=default.target

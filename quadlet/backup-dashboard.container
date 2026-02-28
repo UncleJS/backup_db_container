@@ -1,0 +1,34 @@
+# =============================================================================
+# backup-dashboard.container  — Quadlet container unit
+# Place in: ~/.config/containers/systemd/
+#
+# NOTE: Next.js dashboard. Protected by httpOnly cookie session auth.
+# =============================================================================
+[Unit]
+Description=Backup Dashboard (Next.js)
+After=backup-api.service
+Requires=backup-api.service
+
+[Container]
+Image=localhost/backup-dashboard:latest
+ContainerName=backup-dashboard
+
+Pod=backup-pod.pod
+
+# Secrets
+Secret=internal_api_secret,target=/run/secrets/internal_api_secret
+Secret=dashboard_session_secret,target=/run/secrets/dashboard_session_secret
+Secret=dashboard_admin_password,target=/run/secrets/dashboard_admin_password
+
+# Non-secret environment
+Environment=NODE_ENV=production
+Environment=PORT=3000
+# Internal URL to reach Elysia API (pod-local, no external hop)
+Environment=API_INTERNAL_URL=http://localhost:3001
+
+[Service]
+Restart=on-failure
+RestartSec=10s
+
+[Install]
+WantedBy=default.target

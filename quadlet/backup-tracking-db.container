@@ -1,0 +1,44 @@
+# =============================================================================
+# backup-tracking-db.container  — Quadlet container unit
+# Place in: ~/.config/containers/systemd/
+#
+# NOTE: Uses mariadb:lts. Root password comes from Podman secret.
+# =============================================================================
+[Unit]
+Description=Backup Tracking Database (MariaDB)
+After=backup-pod.service
+Requires=backup-pod.service
+
+[Container]
+Image=localhost/backup-tracking-db:latest
+ContainerName=tracking-db
+
+Pod=backup-pod.pod
+
+# Data volume
+Volume=tracking-data:/var/lib/mysql:z
+
+# Secrets
+Secret=tracking_db_root_password,target=/run/secrets/tracking_db_root_password
+
+# MariaDB reads the root password from a file
+Environment=MARIADB_ROOT_PASSWORD_FILE=/run/secrets/tracking_db_root_password
+Environment=MARIADB_DATABASE=backup_tracking
+Environment=MARIADB_USER=backup_api
+Environment=MARIADB_PASSWORD_FILE=/run/secrets/tracking_db_password
+
+Secret=tracking_db_password,target=/run/secrets/tracking_db_password
+
+# Health check
+HealthCmd=healthcheck.sh --connect --innodb_initialized
+HealthInterval=15s
+HealthRetries=5
+HealthStartPeriod=30s
+HealthTimeout=5s
+
+[Service]
+Restart=on-failure
+RestartSec=10s
+
+[Install]
+WantedBy=default.target

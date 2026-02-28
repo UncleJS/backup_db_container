@@ -1,0 +1,36 @@
+# =============================================================================
+# backup-api.container  — Quadlet container unit
+# Place in: ~/.config/containers/systemd/
+#
+# NOTE: Runs the Elysia/Bun API. Swagger UI at http://localhost:3001/swagger
+# =============================================================================
+[Unit]
+Description=Backup API (Elysia/Bun)
+After=backup-tracking-db.service
+Requires=backup-tracking-db.service
+
+[Container]
+Image=localhost/backup-api:latest
+ContainerName=backup-api
+
+Pod=backup-pod.pod
+
+# Secrets — entrypoint.api.sh reads these into env vars
+Secret=tracking_db_password,target=/run/secrets/tracking_db_password
+Secret=internal_api_secret,target=/run/secrets/internal_api_secret
+
+# Non-secret environment
+Environment=NODE_ENV=production
+Environment=PORT=3001
+# Internal pod hostname for tracking-db (containers share pod network)
+Environment=TRACKING_DB_HOST=localhost
+Environment=TRACKING_DB_PORT=3306
+Environment=TRACKING_DB_NAME=backup_tracking
+Environment=TRACKING_DB_USER=backup_api
+
+[Service]
+Restart=on-failure
+RestartSec=10s
+
+[Install]
+WantedBy=default.target

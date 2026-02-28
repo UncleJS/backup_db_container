@@ -1,0 +1,77 @@
+# =============================================================================
+# backup-agent.container  — Quadlet container unit
+# Place in: ~/.config/containers/systemd/
+#
+# DO NOT edit the UID directly here.
+# Run bin/install.sh — it substitutes @@UID@@ with your real numeric UID.
+# Quadlet does NOT support $UID or shell expansions in unit files.
+# =============================================================================
+[Unit]
+Description=Backup Agent (MariaDB + Volume backup)
+After=backup-api.service backup-tracking-db.service
+Requires=backup-api.service backup-tracking-db.service
+# Agent runs as a one-shot job; it is started by the timer unit.
+
+[Container]
+Image=localhost/backup-agent:latest
+ContainerName=backup-agent
+
+Pod=backup-pod.pod
+
+# ---- Secrets ----------------------------------------------------------------
+Secret=mariadb_backup_password,target=/run/secrets/mariadb_backup_password
+Secret=tracking_db_password,target=/run/secrets/tracking_db_password
+Secret=s3_secret_key,target=/run/secrets/s3_secret_key
+Secret=sftp_password,target=/run/secrets/sftp_password
+Secret=sftp_private_key,target=/run/secrets/sftp_private_key
+Secret=internal_api_secret,target=/run/secrets/internal_api_secret
+
+# ---- Bind mounts ------------------------------------------------------------
+# Backup output directory (host path, adjust as needed)
+Volume=/var/lib/backup-agent/backups:/backups:z
+
+# Podman socket — READ-ONLY. @@UID@@ is replaced by bin/install.sh at install time.
+Volume=/run/user/@@UID@@/podman/podman.sock:/run/podman/podman.sock:ro,z
+
+# ---- Non-secret environment -------------------------------------------------
+Environment=BACKUP_DIR=/backups
+Environment=MARIADB_BACKUP_MODE=full
+Environment=MARIADB_HOST=127.0.0.1
+Environment=MARIADB_PORT=3306
+Environment=MARIADB_BACKUP_USER=root
+
+# API base URL (pod-local)
+Environment=API_BASE_URL=http://localhost:3001
+
+# Source target description (shown in tracking records)
+Environment=BACKUP_TARGET_LABEL=production
+
+# Retention: days to keep local backups
+Environment=RETENTION_DAYS=30
+
+# Rclone S3 config (non-secret parts)
+Environment=RCLONE_CONFIG_S3BACKUPTOOL_TYPE=s3
+Environment=RCLONE_CONFIG_S3BACKUPTOOL_PROVIDER=Other
+Environment=RCLONE_CONFIG_S3BACKUPTOOL_ENV_AUTH=false
+Environment=RCLONE_CONFIG_S3BACKUPTOOL_ENDPOINT=https://s3.amazonaws.com
+Environment=RCLONE_CONFIG_S3BACKUPTOOL_REGION=us-east-1
+Environment=RCLONE_CONFIG_S3BACKUPTOOL_ACCESS_KEY_ID=CHANGE_ME
+Environment=S3_BUCKET=my-backups-bucket
+Environment=S3_PATH_PREFIX=backups/
+
+# Rclone SFTP config (non-secret parts)
+Environment=RCLONE_CONFIG_SFTPTOOL_TYPE=sftp
+Environment=RCLONE_CONFIG_SFTPTOOL_HOST=sftp.example.com
+Environment=RCLONE_CONFIG_SFTPTOOL_PORT=22
+Environment=RCLONE_CONFIG_SFTPTOOL_USER=backup-user
+Environment=SFTP_PATH=/backups/
+
+[Service]
+# One-shot: exits after backup is complete
+Type=oneshot
+RemainAfterExit=no
+Restart=on-failure
+RestartSec=30s
+
+[Install]
+WantedBy=default.target

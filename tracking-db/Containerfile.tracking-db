@@ -1,0 +1,20 @@
+# =============================================================================
+# tracking-db — Containerfile
+# Base: mariadb:lts
+# Purpose: Hosts the backup tracking database inside the backup pod.
+#          All credentials are supplied via Podman secrets.
+# =============================================================================
+FROM mariadb:lts
+
+# MariaDB reads MARIADB_ROOT_PASSWORD_FILE from the secret mount at runtime.
+# No passwords are baked into the image.
+
+# Optional: pre-load any init SQL (schema is managed by Drizzle migrations in
+# the API container on first startup, so no init script is strictly required).
+# If you want a safety-net, uncomment and add /docker-entrypoint-initdb.d/ scripts.
+
+# Expose the default port (remapped to 3307 on the pod network via Quadlet)
+EXPOSE 3306
+
+# Data directory is persisted via the named volume tracking-data
+VOLUME ["/var/lib/mysql"]

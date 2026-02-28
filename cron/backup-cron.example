@@ -1,0 +1,24 @@
+# =============================================================================
+# backup-cron.example
+#
+# Alternative to the Quadlet timer: add lines like these to your user's crontab.
+# Run: crontab -e
+#
+# The backup agent container must already be running (or set up to start on-demand).
+# =============================================================================
+
+# ---------------------------------------------------------------------------
+# Daily full backup at 02:00
+# ---------------------------------------------------------------------------
+0 2 * * *  systemctl --user start backup-agent.service >> /var/log/backup-agent-cron.log 2>&1
+
+# ---------------------------------------------------------------------------
+# Incremental backups every 6 hours (except at 02:00 when the full runs)
+# ---------------------------------------------------------------------------
+# 0 8,14,20 * * *  systemctl --user start backup-agent.service >> /var/log/backup-agent-cron.log 2>&1
+
+# ---------------------------------------------------------------------------
+# Apply any schedule changes from the dashboard at boot
+# (runs 2 minutes after login to ensure the API is up)
+# ---------------------------------------------------------------------------
+@reboot sleep 120 && /path/to/backup_db_container/scripts/apply-schedule.sh >> /var/log/backup-schedule-apply.log 2>&1

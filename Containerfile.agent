@@ -1,0 +1,40 @@
+# =============================================================================
+# backup-agent — Containerfile
+# Base: mariadb:lts  (ships mariadb-backup + mariadb-dump pre-installed)
+# Adds: rclone (S3 + SFTP uploads), curl (health checks), jq (JSON parsing)
+# =============================================================================
+FROM mariadb:lts
+
+# Install extra tools
+RUN apt-get update \
+ && apt-get install -y --no-install-recommends \
+      rclone \
+      curl \
+      jq \
+      ca-certificates \
+      findutils \
+      gzip \
+      tar \
+ && rm -rf /var/lib/apt/lists/*
+
+# Create backup working directories
+RUN mkdir -p /backups /tmp/backup-work /scripts
+
+# Copy all backup scripts
+COPY scripts/backup.sh          /scripts/backup.sh
+COPY scripts/backup_mariadb.sh  /scripts/backup_mariadb.sh
+COPY scripts/backup_volumes.sh  /scripts/backup_volumes.sh
+COPY scripts/backup_configs.sh  /scripts/backup_configs.sh
+COPY scripts/upload_s3.sh       /scripts/upload_s3.sh
+COPY scripts/upload_sftp.sh     /scripts/upload_sftp.sh
+COPY scripts/prune.sh           /scripts/prune.sh
+COPY scripts/db_record.sh       /scripts/db_record.sh
+
+# Make all scripts executable
+RUN chmod +x /scripts/*.sh
+
+# Backup output volume
+VOLUME ["/backups"]
+
+# Entrypoint
+ENTRYPOINT ["/scripts/backup.sh"]

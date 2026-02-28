@@ -1,0 +1,18 @@
+# =============================================================================
+# backup-agent.timer  — Quadlet timer unit
+# Place in: ~/.config/containers/systemd/
+#
+# Default: daily at 02:00. Run apply-schedule.sh to update from the dashboard.
+# =============================================================================
+[Unit]
+Description=Backup Agent Schedule Timer
+After=backup-pod.service
+
+[Timer]
+# Default schedule — overwritten by apply-schedule.sh
+OnCalendar=*-*-* 02:00:00
+RandomizedDelaySec=60
+Persistent=true
+
+[Install]
+WantedBy=timers.target
