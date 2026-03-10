@@ -1,5 +1,19 @@
 # Architecture
 
+![License: CC BY-NC-SA 4.0](https://img.shields.io/badge/License-CC--BY--NC--SA%204.0-lightgrey.svg)
+![Docs](https://img.shields.io/badge/docs-architecture-1f6feb)
+![Design](https://img.shields.io/badge/design-system-0969da)
+
+## Table of Contents
+
+- [Pod Topology](#pod-topology)
+- [Authentication Flow](#authentication-flow)
+- [Backup Agent Flow](#backup-agent-flow)
+- [Database Schema](#database-schema)
+- [Secrets Model](#secrets-model)
+- [Scheduling](#scheduling)
+- [Data Lifecycle](#data-lifecycle)
+
 ## Pod Topology
 
 ```
@@ -24,6 +38,8 @@
 
 All containers share the pod network (`localhost`). No inter-container DNS is needed.
 
+[Back to TOC](#table-of-contents)
+
 ## Authentication Flow
 
 ```
@@ -40,6 +56,8 @@ Dashboard (client components) → Next.js /api/* route handlers
   └─ Route handler checks getSession() cookie
   └─ Forwards to Elysia with Bearer header
 ```
+
+[Back to TOC](#table-of-contents)
 
 ## Backup Agent Flow
 
@@ -59,6 +77,8 @@ backup.sh (main)
   └─ PATCH /runs/:id    → finalize (status, duration, total_size)
 ```
 
+[Back to TOC](#table-of-contents)
+
 ## Database Schema
 
 | Table | Purpose |
@@ -71,11 +91,15 @@ backup.sh (main)
 | `settings` | Key-value store for agent config |
 | `retention_events` | Log of pruned files |
 
+[Back to TOC](#table-of-contents)
+
 ## Secrets Model
 
 All secrets are Podman secrets mounted at `/run/secrets/<name>`. They are read
 into environment variables inside each container's entrypoint script and never
 written to logs, image layers, or env files. See `secrets/SECRETS.md`.
+
+[Back to TOC](#table-of-contents)
 
 ## Scheduling
 
@@ -86,8 +110,15 @@ Two mechanisms are supported:
 
 2. **User crontab** — see `cron/backup-cron.example`.
 
+[Back to TOC](#table-of-contents)
+
 ## Data Lifecycle
 
 - No hard deletes in the tracking DB. Destinations use `archived_at` soft-delete.
 - Local backup files are pruned by `prune.sh` after `RETENTION_DAYS`.
 - All pruning events are recorded in `retention_events`.
+
+[Back to TOC](#table-of-contents)
+
+---
+Licensed under [CC BY-NC-SA 4.0](../LICENSE.md).

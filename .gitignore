@@ -36,3 +36,9 @@ bun-debug.log*
 *.seed
 *.pid.lock
 .cache/
+
+
+
+
+
+secrets/SECRETS.md

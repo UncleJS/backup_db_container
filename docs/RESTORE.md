@@ -1,5 +1,18 @@
 # Restore Guide
 
+![License: CC BY-NC-SA 4.0](https://img.shields.io/badge/License-CC--BY--NC--SA%204.0-lightgrey.svg)
+![Docs](https://img.shields.io/badge/docs-restore-1f6feb)
+![Recovery](https://img.shields.io/badge/recovery-runbook-2ea043)
+
+## Table of Contents
+
+- [Restoring a MariaDB Physical Backup (mariadb-backup)](#restoring-a-mariadb-physical-backup-mariadb-backup)
+- [Restoring a Logical Backup (mariadb-dump)](#restoring-a-logical-backup-mariadb-dump)
+- [Restoring a Podman Volume](#restoring-a-podman-volume)
+- [Restoring Container / Pod Configs](#restoring-container--pod-configs)
+- [Downloading from S3](#downloading-from-s3)
+- [Downloading from SFTP](#downloading-from-sftp)
+
 ## Restoring a MariaDB Physical Backup (mariadb-backup)
 
 Physical backups are stored as compressed `.qp` files in `/backups/mariadb/TIMESTAMP/`.
@@ -49,6 +62,8 @@ mariadb-backup --prepare \
 # 3. Copy back (same as full restore steps 3-7 above)
 ```
 
+[Back to TOC](#table-of-contents)
+
 ## Restoring a Logical Backup (mariadb-dump)
 
 Logical backups are gzipped SQL dumps stored as `.sql.gz` files.
@@ -62,6 +77,8 @@ zcat /backups/mariadb/dump/my_database_2026-02-28.sql.gz \
 zcat /backups/mariadb/dump/all_databases_2026-02-28.sql.gz \
   | mariadb -u root -p
 ```
+
+[Back to TOC](#table-of-contents)
 
 ## Restoring a Podman Volume
 
@@ -82,6 +99,8 @@ podman run --rm \
   sh -c "cd /restore && tar xzf /backup.tar.gz --strip-components=1"
 ```
 
+[Back to TOC](#table-of-contents)
+
 ## Restoring Container / Pod Configs
 
 Config exports are JSON files (from `podman inspect`) and `.container` / `.pod`
@@ -101,6 +120,8 @@ systemctl --user daemon-reload
 systemctl --user start myapp-pod.service
 ```
 
+[Back to TOC](#table-of-contents)
+
 ## Downloading from S3
 
 ```bash
@@ -112,9 +133,16 @@ rclone copy S3BACKUPTOOL:my-backups-bucket/backups/mariadb/2026-02-28_02-00-00 \
             /restore/mariadb/2026-02-28_02-00-00
 ```
 
+[Back to TOC](#table-of-contents)
+
 ## Downloading from SFTP
 
 ```bash
 rclone copy SFTPTOOL:/backups/mariadb/2026-02-28_02-00-00 \
             /restore/mariadb/2026-02-28_02-00-00
 ```
+
+[Back to TOC](#table-of-contents)
+
+---
+Licensed under [CC BY-NC-SA 4.0](../LICENSE.md).

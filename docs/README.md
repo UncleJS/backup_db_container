@@ -1,7 +1,19 @@
 # backup_db_container
 
+![License: CC BY-NC-SA 4.0](https://img.shields.io/badge/License-CC--BY--NC--SA%204.0-lightgrey.svg)
+![Docs](https://img.shields.io/badge/docs-index-1f6feb)
+![Status](https://img.shields.io/badge/status-active-2ea043)
+
 A self-contained, rootless Podman backup solution for MariaDB databases and Podman volumes.
 Runs as a single pod with four containers: tracking database, backup agent, REST API, and Next.js dashboard.
+
+## Table of Contents
+
+- [Features](#features)
+- [Quick Start](#quick-start)
+- [Documentation](#documentation)
+- [Stack](#stack)
+- [Ports](#ports)
 
 ## Features
 
@@ -16,6 +28,8 @@ Runs as a single pod with four containers: tracking database, backup agent, REST
 - **Manual trigger** — run a backup on demand from the dashboard
 - **Systemd timer** — schedule backups with full cron expression support
 - **Archive-only data model** — records are never hard-deleted
+
+[Back to TOC](#table-of-contents)
 
 ## Quick Start
 
@@ -49,6 +63,8 @@ systemctl --user start backup-pod.service
 xdg-open http://localhost:3000
 ```
 
+[Back to TOC](#table-of-contents)
+
 ## Documentation
 
 | Doc | Description |
@@ -57,6 +73,8 @@ xdg-open http://localhost:3000
 | [USER_GUIDE.md](USER_GUIDE.md) | Day-to-day usage, dashboard walkthrough |
 | [RESTORE.md](RESTORE.md) | How to restore from backup |
 | [TROUBLESHOOTING.md](TROUBLESHOOTING.md) | Common issues and fixes |
+
+[Back to TOC](#table-of-contents)
 
 ## Stack
 
@@ -68,6 +86,8 @@ xdg-open http://localhost:3000
 | Database | MariaDB + Drizzle ORM |
 | Dashboard | Next.js 15 + Tailwind CSS + shadcn/ui |
 
+[Back to TOC](#table-of-contents)
+
 ## Ports
 
 | Port | Service |
@@ -75,3 +95,8 @@ xdg-open http://localhost:3000
 | 3000 | Dashboard |
 | 3001 | API (Swagger UI at `/swagger`) |
 | 3307 | Tracking DB (host-side, optional) |
+
+[Back to TOC](#table-of-contents)
+
+---
+Licensed under [CC BY-NC-SA 4.0](../LICENSE.md).

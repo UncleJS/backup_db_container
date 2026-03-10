@@ -1,7 +1,19 @@
 # Podman Secrets Reference
 
+![License: CC BY-NC-SA 4.0](https://img.shields.io/badge/License-CC--BY--NC--SA%204.0-lightgrey.svg)
+![Docs](https://img.shields.io/badge/docs-secrets-1f6feb)
+![Security](https://img.shields.io/badge/security-podman--secrets-b60205)
+
 All credentials are stored as Podman secrets and never written to env files,
 image layers, or logs.
+
+## Table of Contents
+
+- [Creating secrets](#creating-secrets)
+- [Listing secrets](#listing-secrets)
+- [Rotating a secret](#rotating-a-secret)
+- [Secret -> Container mapping](#secret---container-mapping)
+- [Notes](#notes)
 
 ## Creating secrets
 
@@ -36,11 +48,15 @@ printf "$(openssl rand -hex 32)" | podman secret create dashboard_session_secret
 printf 'my-admin-password' | podman secret create dashboard_admin_password -
 ```
 
+[Back to TOC](#table-of-contents)
+
 ## Listing secrets
 
 ```bash
 podman secret ls
 ```
+
+[Back to TOC](#table-of-contents)
 
 ## Rotating a secret
 
@@ -52,6 +68,8 @@ printf "$(openssl rand -hex 32)" | podman secret create internal_api_secret -
 # Restart affected containers
 systemctl --user restart backup-api.service backup-dashboard.service
 ```
+
+[Back to TOC](#table-of-contents)
 
 ## Secret → Container mapping
 
@@ -67,6 +85,8 @@ systemctl --user restart backup-api.service backup-dashboard.service
 | `dashboard_session_secret`   | backup-dashboard                        | `/run/secrets/dashboard_session_secret`     |
 | `dashboard_admin_password`   | backup-dashboard                        | `/run/secrets/dashboard_admin_password`     |
 
+[Back to TOC](#table-of-contents)
+
 ## Notes
 
 - **Never** pass secrets via `Environment=` in Quadlet files.
@@ -75,3 +95,8 @@ systemctl --user restart backup-api.service backup-dashboard.service
   still needed for container restarts via `MARIADB_ROOT_PASSWORD_FILE`.
 - `sftp_password` and `sftp_private_key` are both optional; the backup agent
   auto-detects which to use at runtime.
+
+[Back to TOC](#table-of-contents)
+
+---
+Licensed under [CC BY-NC-SA 4.0](../LICENSE.md).

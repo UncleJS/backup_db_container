@@ -1,5 +1,18 @@
 # User Guide
 
+![License: CC BY-NC-SA 4.0](https://img.shields.io/badge/License-CC--BY--NC--SA%204.0-lightgrey.svg)
+![Docs](https://img.shields.io/badge/docs-user--guide-1f6feb)
+![UI](https://img.shields.io/badge/dashboard-next.js-000000)
+
+## Table of Contents
+
+- [Dashboard Pages](#dashboard-pages)
+- [Running a Manual Backup](#running-a-manual-backup)
+- [Checking the API](#checking-the-api)
+- [Updating the Schedule](#updating-the-schedule)
+- [Adding a Destination](#adding-a-destination)
+- [Viewing Logs](#viewing-logs)
+
 ## Dashboard Pages
 
 ### Overview (`/`)
@@ -33,6 +46,8 @@
 ### Health (`/health`)
 - Traffic-light indicators for: API, tracking DB, S3 connectivity, SFTP connectivity, source MariaDB
 
+[Back to TOC](#table-of-contents)
+
 ## Running a Manual Backup
 
 1. Open the dashboard at `http://localhost:3000`
@@ -41,10 +56,14 @@
    picks it up and starts immediately
 4. Refresh the Runs page to see the new run
 
+[Back to TOC](#table-of-contents)
+
 ## Checking the API
 
 Swagger UI is available at: `http://localhost:3001/swagger`
 OpenAPI JSON: `http://localhost:3001/openapi.json`
+
+[Back to TOC](#table-of-contents)
 
 ## Updating the Schedule
 
@@ -58,6 +77,8 @@ OpenAPI JSON: `http://localhost:3001/openapi.json`
    ```
 5. The systemd timer is updated automatically
 
+[Back to TOC](#table-of-contents)
+
 ## Adding a Destination
 
 1. Go to `/destinations`
@@ -66,6 +87,8 @@ OpenAPI JSON: `http://localhost:3001/openapi.json`
    be a Podman secret)
 4. Click **Add Destination**
 5. The next backup run will upload to the new destination
+
+[Back to TOC](#table-of-contents)
 
 ## Viewing Logs
 
@@ -79,3 +102,8 @@ journalctl --user -u backup-api.service -f
 # Last backup agent run
 journalctl --user -u backup-agent.service
 ```
+
+[Back to TOC](#table-of-contents)
+
+---
+Licensed under [CC BY-NC-SA 4.0](../LICENSE.md).

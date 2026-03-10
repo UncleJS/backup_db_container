@@ -1,5 +1,17 @@
 # Troubleshooting
 
+![License: CC BY-NC-SA 4.0](https://img.shields.io/badge/License-CC--BY--NC--SA%204.0-lightgrey.svg)
+![Docs](https://img.shields.io/badge/docs-troubleshooting-1f6feb)
+![Support](https://img.shields.io/badge/support-ops-orange)
+
+## Table of Contents
+
+- [Container / Pod Issues](#container--pod-issues)
+- [Backup Agent Issues](#backup-agent-issues)
+- [Upload Issues](#upload-issues)
+- [Dashboard Issues](#dashboard-issues)
+- [Viewing All Logs at Once](#viewing-all-logs-at-once)
+
 ## Container / Pod Issues
 
 ### Pod fails to start
@@ -23,6 +35,8 @@ journalctl --user -u backup-tracking-db.service -n 50
 - Confirm `tracking-db` is healthy: `podman healthcheck run tracking-db`
 - Check `TRACKING_DB_HOST=localhost` is set (all containers share the pod network)
 - Ensure `TRACKING_DB_USER` and `tracking_db_password` secret match the DB credentials
+
+[Back to TOC](#table-of-contents)
 
 ## Backup Agent Issues
 
@@ -50,6 +64,8 @@ journalctl --user -u backup-agent.service -n 100
 - Ensure the socket is active: `systemctl --user status podman.socket`
 - Enable it if needed: `systemctl --user enable --now podman.socket`
 
+[Back to TOC](#table-of-contents)
+
 ## Upload Issues
 
 ### S3 upload fails
@@ -65,6 +81,8 @@ journalctl --user -u backup-agent.service -n 100
 - Test connectivity: `ssh backup-user@sftp.example.com`
 - For key auth: confirm `/run/secrets/sftp_private_key` contains valid PEM content
 - For password auth: confirm `sftp_password` secret is set
+
+[Back to TOC](#table-of-contents)
 
 ## Dashboard Issues
 
@@ -86,8 +104,15 @@ journalctl --user -u backup-agent.service -n 100
   ```
 - Check the timer status: `systemctl --user status backup-agent.timer`
 
+[Back to TOC](#table-of-contents)
+
 ## Viewing All Logs at Once
 
 ```bash
 journalctl --user -u 'backup-*' -f
 ```
+
+[Back to TOC](#table-of-contents)
+
+---
+Licensed under [CC BY-NC-SA 4.0](../LICENSE.md).
