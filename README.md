@@ -8,9 +8,11 @@ Self-contained, rootless Podman backup platform for MariaDB databases and Podman
 
 ## Table of Contents
 
-- [Project Docs](#project-docs)
-- [Repository Layout](#repository-layout)
-- [License](#license)
+- [backup\_db\_container](#backup_db_container)
+  - [Table of Contents](#table-of-contents)
+  - [Project Docs](#project-docs)
+  - [Repository Layout](#repository-layout)
+  - [License](#license)
 
 ## Project Docs
 
